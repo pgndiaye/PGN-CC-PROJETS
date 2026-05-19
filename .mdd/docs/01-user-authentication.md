@@ -5,7 +5,6 @@ edition: Both
 depends_on: []
 source_files:
   - src/types/auth.ts
-  - src/models/user.ts
   - src/services/auth.service.ts
   - src/middleware/authenticate.ts
   - src/handlers/auth.handler.ts

@@ -13,8 +13,12 @@ export default function authenticate(req: Request, res: Response, next: NextFunc
   const token = authHeader.slice(7);
 
   try {
-    const payload = jwt.verify(token, process.env.JWT_ACCESS_SECRET ?? '') as JwtAccessPayload;
-    req.user = { id: payload.sub, email: payload.email };
+    const raw = jwt.verify(token, process.env['JWT_ACCESS_SECRET']!) as jwt.JwtPayload;
+    if (typeof raw['sub'] !== 'string' || typeof raw['email'] !== 'string') {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+    req.user = { id: raw['sub'], email: raw['email'] };
     next();
   } catch {
     res.status(401).json({ error: 'Unauthorized' });

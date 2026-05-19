@@ -28,14 +28,14 @@ function getEnv(key: string, fallback: string): string {
 }
 
 function signAccessToken(userId: string, email: string): string {
-  const secret = getEnv('JWT_ACCESS_SECRET', '');
+  const secret = process.env['JWT_ACCESS_SECRET']!;
   const expiresIn = getEnv('JWT_ACCESS_EXPIRES_IN', '15m');
   const payload: JwtAccessPayload = { sub: userId, email };
   return jwt.sign(payload, secret, { expiresIn } as jwt.SignOptions);
 }
 
 function signRefreshToken(userId: string): string {
-  const secret = getEnv('JWT_REFRESH_SECRET', '');
+  const secret = process.env['JWT_REFRESH_SECRET']!;
   const expiresIn = getEnv('JWT_REFRESH_EXPIRES_IN', '7d');
   return jwt.sign({ sub: userId }, secret, { expiresIn } as jwt.SignOptions);
 }
@@ -55,8 +55,8 @@ export async function register(input: RegisterInput): Promise<RegisterResult> {
     throw makeError('Invalid email address', 400);
   }
 
-  if (!input.password || input.password.length < 1) {
-    throw makeError('Password is required', 400);
+  if (!input.password || input.password.length < 8) {
+    throw makeError('Password must be at least 8 characters', 400);
   }
 
   const existing = await prisma.user.findUnique({ where: { email } });

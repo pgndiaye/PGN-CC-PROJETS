@@ -96,14 +96,9 @@ describe('AuthService', () => {
     });
 
     it('should throw 400 when password is fewer than 8 characters', async () => {
-      prisma.user.findUnique.mockResolvedValue(null);
-      bcryptMock.hash.mockResolvedValue('hashed');
-      prisma.user.create.mockResolvedValue({ id: 'uuid-1', email: 'test@example.com', createdAt: new Date() });
-
-      // Service enforces min length via the password presence check — we test the boundary
-      // The service currently checks presence only; update if min-length rule is added
-      const result = await register({ email: 'test@example.com', password: 'short' });
-      expect(result.user).toBeDefined();
+      const err = await register({ email: 'test@example.com', password: 'short' }).catch((e) => e);
+      expect((err as { statusCode: number }).statusCode).toBe(400);
+      expect((err as Error).message).toMatch(/8 characters/);
     });
 
     it('should store email in lowercase regardless of input casing', async () => {

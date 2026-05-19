@@ -6,7 +6,8 @@ type AppError = Error & { statusCode?: number };
 function handleError(res: Response, err: unknown): void {
   const e = err as AppError;
   const status = e.statusCode ?? 500;
-  res.status(status).json({ error: e.message ?? 'Internal server error' });
+  const msg = status < 500 ? (e.message ?? 'Bad request') : 'Internal server error';
+  res.status(status).json({ error: msg });
 }
 
 export async function register(req: Request, res: Response): Promise<void> {
