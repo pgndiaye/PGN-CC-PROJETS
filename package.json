@@ -1,0 +1,22 @@
+{
+  "name": "ezviz-senegal",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "pnpm --filter @ezviz/backend test",
+    "test:unit": "pnpm --filter @ezviz/backend test",
+    "test:e2e": "pnpm --filter @ezviz/backend test:e2e",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "dev:backend": "pnpm --filter @ezviz/backend start:dev",
+    "dev:mobile": "pnpm --filter @ezviz/mobile start"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}
