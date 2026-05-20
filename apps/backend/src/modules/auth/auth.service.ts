@@ -7,7 +7,7 @@ import { ConfigService } from '@nestjs/config';
 import { Role } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../../common/prisma/prisma.service';
-import { UserPayload, AuthTokens, UserRole } from '@ezviz/types';
+import { UserPayload, AuthTokens } from './auth.types';
 
 const BCRYPT_ROUNDS = 12;
 
@@ -40,7 +40,7 @@ export class AuthService {
     const payload: UserPayload = {
       sub: user.id,
       email: user.email,
-      role: user.role as UserRole,
+      role: user.role as Role,
     };
 
     const accessToken = this.jwtService.sign(payload, {
@@ -87,7 +87,7 @@ export class AuthService {
     }
 
     const accessToken = this.jwtService.sign(
-      { sub: user.id, email: user.email, role: user.role as UserRole } satisfies UserPayload,
+      { sub: user.id, email: user.email, role: user.role as Role } satisfies UserPayload,
       {
         secret: this.config.getOrThrow('JWT_SECRET'),
         expiresIn: this.config.get('JWT_EXPIRES_IN', '15m'),
