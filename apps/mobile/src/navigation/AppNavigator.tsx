@@ -3,12 +3,32 @@ import { StyleSheet, Text, View } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import LoginScreen from '../screens/LoginScreen';
+import ClientsScreen from '../screens/ClientsScreen';
+import ClientDetailScreen from '../screens/ClientDetailScreen';
+import CreateClientScreen from '../screens/CreateClientScreen';
+import QrScannerScreen from '../screens/QrScannerScreen';
+import CloudScreen from '../screens/CloudScreen';
+import CloudDetailScreen from '../screens/CloudDetailScreen';
+import CreateSubscriptionScreen from '../screens/CreateSubscriptionScreen';
 
 // ── Param lists ──────────────────────────────────────────────────────────────
 
 export type RootStackParamList = {
   Login: undefined;
   Main: undefined;
+};
+
+export type ClientsStackParamList = {
+  ClientsList: undefined;
+  ClientDetail: { id: string };
+  CreateClient: undefined;
+  QrScanner: undefined;
+};
+
+export type CloudStackParamList = {
+  CloudList: undefined;
+  CloudDetail: { id: string };
+  CreateSubscription: { clientId?: string; clientName?: string };
 };
 
 type MainTabParamList = {
@@ -29,6 +49,77 @@ function makePlaceholder(label: string) {
       </View>
     );
   };
+}
+
+// ── Cloud stack ──────────────────────────────────────────────────────────────
+
+const CloudStack = createNativeStackNavigator<CloudStackParamList>();
+
+function CloudNavigator() {
+  return (
+    <CloudStack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: '#16213e' },
+        headerTintColor: '#00e5cc',
+        headerTitleStyle: { color: '#fff' },
+        contentStyle: { backgroundColor: '#1a1a2e' },
+      }}
+    >
+      <CloudStack.Screen
+        name="CloudList"
+        component={CloudScreen}
+        options={{ title: 'Cloud EZVIZ' }}
+      />
+      <CloudStack.Screen
+        name="CloudDetail"
+        component={CloudDetailScreen}
+        options={{ title: 'Abonnement' }}
+      />
+      <CloudStack.Screen
+        name="CreateSubscription"
+        component={CreateSubscriptionScreen}
+        options={{ title: 'Nouvel abonnement' }}
+      />
+    </CloudStack.Navigator>
+  );
+}
+
+// ── Clients stack ────────────────────────────────────────────────────────────
+
+const ClientsStack = createNativeStackNavigator<ClientsStackParamList>();
+
+function ClientsNavigator() {
+  return (
+    <ClientsStack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: '#16213e' },
+        headerTintColor: '#00e5cc',
+        headerTitleStyle: { color: '#fff' },
+        contentStyle: { backgroundColor: '#1a1a2e' },
+      }}
+    >
+      <ClientsStack.Screen
+        name="ClientsList"
+        component={ClientsScreen}
+        options={{ title: 'Clients' }}
+      />
+      <ClientsStack.Screen
+        name="ClientDetail"
+        component={ClientDetailScreen}
+        options={{ title: 'Fiche client' }}
+      />
+      <ClientsStack.Screen
+        name="CreateClient"
+        component={CreateClientScreen}
+        options={{ title: 'Nouveau client' }}
+      />
+      <ClientsStack.Screen
+        name="QrScanner"
+        component={QrScannerScreen}
+        options={{ title: 'Scanner QR', presentation: 'fullScreenModal' }}
+      />
+    </ClientsStack.Navigator>
+  );
 }
 
 // ── Tab navigator ────────────────────────────────────────────────────────────
@@ -53,12 +144,12 @@ function MainNavigator() {
       />
       <Tab.Screen
         name="Clients"
-        component={makePlaceholder('Clients')}
+        component={ClientsNavigator}
         options={{ tabBarLabel: 'Clients', tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>👥</Text> }}
       />
       <Tab.Screen
         name="Cloud"
-        component={makePlaceholder('Cloud')}
+        component={CloudNavigator}
         options={{ tabBarLabel: 'Cloud', tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>☁️</Text> }}
       />
       <Tab.Screen
