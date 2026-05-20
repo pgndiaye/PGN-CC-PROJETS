@@ -8,6 +8,9 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { ClientsModule } from './modules/clients/clients.module';
 import { CloudModule } from './modules/cloud/cloud.module';
+import { OrdersModule } from './modules/orders/orders.module';
+import { PaymentsModule } from './modules/payments/payments.module';
+import { StockModule } from './modules/stock/stock.module';
 
 @Module({
   imports: [
@@ -26,6 +29,9 @@ import { CloudModule } from './modules/cloud/cloud.module';
     UsersModule,
     ClientsModule,
     CloudModule,
+    OrdersModule,
+    PaymentsModule,
+    StockModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -19,6 +19,7 @@ model User {
   refreshToken String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  orders       Order[]
 
   @@map("users")
 }
@@ -39,6 +40,7 @@ model Client {
   createdAt     DateTime            @default(now())
   updatedAt     DateTime            @updatedAt
   subscriptions CloudSubscription[]
+  orders        Order[]
 
   @@map("clients")
 }
@@ -62,4 +64,64 @@ model CloudSubscription {
 enum ClientType {
   ENTREPRISE
   PARTICULIER
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CASH
+  ORANGE_MONEY
+  WAVE
+}
+
+model Order {
+  id            String        @id @default(cuid())
+  clientId      String
+  createdById   String
+  total         Float
+  status        OrderStatus   @default(PENDING)
+  paymentMethod PaymentMethod?
+  paymentRef    String?
+  notes         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  client    Client      @relation(fields: [clientId], references: [id])
+  createdBy User        @relation(fields: [createdById], references: [id])
+  lines     OrderLine[]
+
+  @@map("orders")
+}
+
+model OrderLine {
+  id          String   @id @default(cuid())
+  orderId     String
+  productName String
+  productType String?
+  qty         Int      @default(1)
+  unitPrice   Float
+  subtotal    Float
+  createdAt   DateTime @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("order_lines")
+}
+
+model StockItem {
+  id          String   @id @default(cuid())
+  productName String
+  productType String?
+  sku         String?  @unique
+  qty         Int      @default(0)
+  minQty      Int      @default(0)
+  unitPrice   Float    @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("stock_items")
 }
