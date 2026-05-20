@@ -76,6 +76,8 @@ graph TD
   d11 --> d08
   d11 --> d10
 
+  %% d10 = stock-module (id in doc), d11 = web-dashboard
+
   classDef complete fill:#00e5cc,color:#000
   classDef in_progress fill:#ffaa00,color:#000
   classDef draft fill:#888,color:#fff
@@ -100,4 +102,4 @@ Files referenced by 2 or more docs:
 | 2 | ⚠ | 11-web-dashboard.md | Missing `path` field — run `/mdd update 11` to add |
 | 3 | ⚠ | 10-stock-module.md | Missing `source_files` field |
 | 4 | ⚠ | 11-web-dashboard.md | Missing `source_files` field |
-| 5 | ❌ | 11-web-dashboard.md | Broken `depends_on`: references `10-stock-module` but actual id is `stock-module` |
+| 5 | ✅ | 11-web-dashboard.md | `depends_on` fixed: `stock-module` (was `10-stock-module`) |

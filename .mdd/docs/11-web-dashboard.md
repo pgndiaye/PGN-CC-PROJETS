@@ -3,7 +3,7 @@ id: web-dashboard
 wave: ezviz-senegal-wave-3
 title: "Web Dashboard"
 status: in_progress
-depends_on: [08-orders-module, 10-stock-module]
+depends_on: [08-orders-module, stock-module]
 created: 2026-05-20
 hash: placeholder
 ---
