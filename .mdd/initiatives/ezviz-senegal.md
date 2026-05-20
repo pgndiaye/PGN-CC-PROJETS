@@ -2,8 +2,8 @@
 id: ezviz-senegal
 title: EZVIZ Sénégal Management System
 status: active
-version: 5
-hash: 2d6ec4dd2e8720e08b2e8986cfb4c345
+version: 6
+hash: 2d1fdcfe78d600c0cb640dad19161e45
 created: 2026-05-19
 ---
 

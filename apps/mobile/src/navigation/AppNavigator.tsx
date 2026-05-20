@@ -10,6 +10,11 @@ import QrScannerScreen from '../screens/QrScannerScreen';
 import CloudScreen from '../screens/CloudScreen';
 import CloudDetailScreen from '../screens/CloudDetailScreen';
 import CreateSubscriptionScreen from '../screens/CreateSubscriptionScreen';
+import OrdersScreen from '../screens/OrdersScreen';
+import CreateOrderScreen from '../screens/CreateOrderScreen';
+import OrderDetailScreen from '../screens/OrderDetailScreen';
+import PaymentWebViewScreen from '../screens/PaymentWebViewScreen';
+import StockScreen from '../screens/StockScreen';
 
 // ── Param lists ──────────────────────────────────────────────────────────────
 
@@ -31,11 +36,19 @@ export type CloudStackParamList = {
   CreateSubscription: { clientId?: string; clientName?: string };
 };
 
+export type OrdersStackParamList = {
+  OrdersList: undefined;
+  OrderDetail: { id: string };
+  CreateOrder: { clientId?: string };
+  PaymentInit: { orderId: string; total: number };
+};
+
 type MainTabParamList = {
   Accueil: undefined;
   Clients: undefined;
   Cloud: undefined;
   Commandes: undefined;
+  Stock: undefined;
   SAV: undefined;
 };
 
@@ -49,6 +62,44 @@ function makePlaceholder(label: string) {
       </View>
     );
   };
+}
+
+// ── Orders stack ─────────────────────────────────────────────────────────────
+
+const OrdersStack = createNativeStackNavigator<OrdersStackParamList>();
+
+function OrdersNavigator() {
+  return (
+    <OrdersStack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: '#16213e' },
+        headerTintColor: '#00e5cc',
+        headerTitleStyle: { color: '#fff' },
+        contentStyle: { backgroundColor: '#1a1a2e' },
+      }}
+    >
+      <OrdersStack.Screen
+        name="OrdersList"
+        component={OrdersScreen}
+        options={{ title: 'Commandes' }}
+      />
+      <OrdersStack.Screen
+        name="CreateOrder"
+        component={CreateOrderScreen}
+        options={{ title: 'Nouvelle commande' }}
+      />
+      <OrdersStack.Screen
+        name="OrderDetail"
+        component={OrderDetailScreen}
+        options={{ title: 'Commande' }}
+      />
+      <OrdersStack.Screen
+        name="PaymentInit"
+        component={PaymentWebViewScreen}
+        options={{ title: 'Paiement Mobile Money' }}
+      />
+    </OrdersStack.Navigator>
+  );
 }
 
 // ── Cloud stack ──────────────────────────────────────────────────────────────
@@ -154,8 +205,13 @@ function MainNavigator() {
       />
       <Tab.Screen
         name="Commandes"
-        component={makePlaceholder('Commandes')}
+        component={OrdersNavigator}
         options={{ tabBarLabel: 'Commandes', tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>🛒</Text> }}
+      />
+      <Tab.Screen
+        name="Stock"
+        component={StockScreen}
+        options={{ tabBarLabel: 'Stock', tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>📦</Text> }}
       />
       <Tab.Screen
         name="SAV"
