@@ -28,3 +28,38 @@ enum Role {
   COMMERCIAL
   TECHNICIEN
 }
+
+model Client {
+  id            String              @id @default(cuid())
+  name          String
+  phone         String
+  address       String?
+  city          String
+  type          ClientType          @default(PARTICULIER)
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  subscriptions CloudSubscription[]
+
+  @@map("clients")
+}
+
+model CloudSubscription {
+  id           String   @id @default(cuid())
+  clientId     String
+  serialNumber String
+  planMonths   Int
+  activatedAt  DateTime @default(now())
+  expiresAt    DateTime
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@map("cloud_subscriptions")
+}
+
+enum ClientType {
+  ENTREPRISE
+  PARTICULIER
+}

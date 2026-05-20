@@ -2,8 +2,8 @@
 id: ezviz-senegal
 title: EZVIZ Sénégal Management System
 status: active
-version: 4
-hash: 6a35c8f7f18d0cf066082bc05f224d4a
+version: 5
+hash: 2d6ec4dd2e8720e08b2e8986cfb4c345
 created: 2026-05-19
 ---
 
@@ -24,7 +24,7 @@ Target users: **ADMIN** (full access), **COMMERCIAL** (clients, cloud, orders, s
 | Wave | File | Demo-state | Status |
 |------|------|------------|--------|
 | Wave 1 | waves/ezviz-senegal-wave-1.md | Admin can log in with JWT auth; role-based access enforced; first Expo build runs on device | complete |
-| Wave 2 | waves/ezviz-senegal-wave-2.md | Commercial can create clients, scan QR codes, and activate EZVIZ cloud subscriptions with offline sync | planned |
+| Wave 2 | waves/ezviz-senegal-wave-2.md | Commercial can create clients, scan QR codes, and activate EZVIZ cloud subscriptions with offline sync | complete |
 | Wave 3 | waves/ezviz-senegal-wave-3.md | Commercial can create orders paid via Mobile Money; stock decrements automatically; web dashboard shows live orders | planned |
 | Wave 4 | waves/ezviz-senegal-wave-4.md | Technicien can open SAV tickets with photos, assign interventions, and receive push/SMS/WhatsApp notifications | planned |
 | Wave 5 | waves/ezviz-senegal-wave-5.md | MVP deployed on Coolify with Grafana monitoring active; team trained; full technical documentation delivered | planned |
