@@ -1,11 +1,25 @@
 ---
-id: stock-module
+id: 10-stock-module
 wave: ezviz-senegal-wave-3
 title: "Stock Module"
 status: in_progress
 depends_on: [08-orders-module]
+source_files:
+  - apps/backend/prisma/schema.prisma
+  - apps/backend/src/modules/stock/stock.module.ts
+  - apps/backend/src/modules/stock/stock.service.ts
+  - apps/backend/src/modules/stock/stock.controller.ts
+  - apps/backend/src/modules/stock/stock.service.spec.ts
+  - apps/backend/src/modules/stock/dto/create-stock-item.dto.ts
+  - apps/backend/src/modules/stock/dto/update-stock-item.dto.ts
+  - apps/backend/src/modules/stock/dto/adjust-stock.dto.ts
+  - apps/mobile/src/hooks/useStock.ts
+  - apps/mobile/src/screens/StockScreen.tsx
 created: 2026-05-20
-hash: placeholder
+last_synced: 2026-05-21
+tags: [stock, inventory, nestjs, prisma, react-native, decrement, orders, mobile]
+path: Commerce/Stock
+known_issues: []
 ---
 
 ## Purpose
@@ -34,30 +48,59 @@ No foreign key to Order — decrement is done as a best-effort side effect durin
 
 ## API Routes (all under /api/v1/stock)
 
-| Method | Path       | Auth             | Description                        |
-|--------|------------|------------------|------------------------------------|
-| GET    | /          | JWT (any)        | List all stock items               |
-| GET    | /:id       | JWT (any)        | Get single item                    |
-| POST   | /          | JWT ADMIN        | Create a stock item                |
-| PATCH  | /:id       | JWT ADMIN        | Update qty / price / name          |
-| DELETE | /:id       | JWT ADMIN        | Delete a stock item                |
-| POST   | /:id/adjust| JWT ADMIN        | Adjust qty by delta (+/-)          |
+| Method | Path        | Auth       | Description                     |
+|--------|-------------|------------|---------------------------------|
+| GET    | /           | JWT (any)  | List all stock items (ordered by productName ASC) |
+| GET    | /:id        | JWT (any)  | Get single item                 |
+| POST   | /           | JWT ADMIN  | Create a stock item             |
+| PATCH  | /:id        | JWT ADMIN  | Update qty / price / name       |
+| DELETE | /:id        | JWT ADMIN  | Delete a stock item             |
+| POST   | /:id/adjust | JWT ADMIN  | Adjust qty by delta (+/-)       |
+
+## DTOs
+
+### CreateStockItemDto
+
+| Field       | Type    | Required | Validation        |
+|-------------|---------|----------|-------------------|
+| productName | string  | yes      | —                 |
+| productType | string  | no       | —                 |
+| sku         | string  | no       | —                 |
+| qty         | integer | no       | @Min(0)           |
+| minQty      | integer | no       | @Min(0)           |
+| unitPrice   | number  | no       | @Min(0)           |
+
+`UpdateStockItemDto` makes all fields optional with the same validations.
+
+### AdjustStockDto
+
+| Field  | Type    | Required | Notes                          |
+|--------|---------|----------|--------------------------------|
+| delta  | integer | yes      | Can be negative (decrement)    |
+| reason | string  | no       | Freeform audit note            |
 
 ## Business Rules
 
-- qty must be >= 0 after creation (no direct negative creation)
-- adjust endpoint accepts `{ delta: number; reason?: string }` — delta can be negative
-- Order creation triggers `decrementByProductName(productName, qty)` on all matching stock items (case-insensitive). Non-fatal if no match found.
-- Low-stock flag returned in GET when `qty <= minQty`
+- `qty` must be >= 0 at creation (`@Min(0)` validation on DTO)
+- `adjust` endpoint uses Prisma `increment` — negative delta decrements; no floor enforced, so stock can go negative (backorder)
+- `findOne` throws `NotFoundException` if item does not exist; used as pre-check before update, remove, and adjust
+- **Low-stock flag is computed client-side** (not returned by the backend): the mobile hook (`useStock.ts`) appends `lowStock: item.qty <= item.minQty` to each item after fetching. The API itself returns raw `qty` and `minQty`.
 
 ## Integration with Orders
 
-`OrdersService.create` is updated to call `StockService.decrementByOrderLines(lines)` after the order transaction succeeds. Implemented as fire-and-forget (no throw on failure) to avoid blocking order creation if stock data is missing.
+`OrdersService.create` calls `StockService.decrementByOrderLines(lines)` after the order transaction succeeds.
+
+- `decrementByOrderLines` iterates each `{ productName, qty }` line sequentially (not in a single transaction)
+- Lookup is case-insensitive on `productName` — uses `{ mode: 'insensitive' }` in Prisma
+- Fire-and-forget: no throw on missing match — stock decrement failure does not block order creation
+- **StockModule exports StockService** — required for `OrdersModule` to inject it via `imports: [StockModule]`
 
 ## Mobile Screens
 
-- `StockScreen` — list with search + low-stock highlight
-- No create/delete from mobile (admin-only via API or future web dashboard)
+- **StockScreen** — FlatList of stock items with:
+  - Live search by `productName`, `productType`, or `sku` (case-insensitive)
+  - Low-stock highlight: card border `#f59e0b`, qty text amber, "⚠ Bas" badge
+  - No create/delete/adjust from mobile (admin-only operations via API only)
 
 ## Backend Files
 
@@ -70,14 +113,14 @@ apps/backend/src/modules/stock/
   stock.service.ts          (CRUD + decrementByOrderLines)
   stock.service.spec.ts     (unit tests)
   stock.controller.ts
-  stock.module.ts
+  stock.module.ts           (exports StockService)
 ```
 
 ## Mobile Files
 
 ```
 apps/mobile/src/
-  hooks/useStock.ts
+  hooks/useStock.ts         (fetches /stock, computes lowStock client-side)
   screens/StockScreen.tsx
 ```
 

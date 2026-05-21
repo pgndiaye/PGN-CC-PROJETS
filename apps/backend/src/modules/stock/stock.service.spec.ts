@@ -37,6 +37,12 @@ describe('StockService', () => {
       const result = await service.findAll();
       expect(result).toEqual([mockItem]);
     });
+
+    it('orders results by productName ascending', async () => {
+      mockPrisma.stockItem.findMany.mockResolvedValue([mockItem]);
+      await service.findAll();
+      expect(mockPrisma.stockItem.findMany).toHaveBeenCalledWith({ orderBy: { productName: 'asc' } });
+    });
   });
 
   describe('findOne', () => {
