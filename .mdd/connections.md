@@ -74,11 +74,11 @@ Files referenced by 2+ docs:
 | File | Referenced by |
 |------|--------------|
 | `apps/backend/prisma/schema.prisma` | 01-project-scaffolding, 05-clients-module, 06-cloud-module, 08-orders-module, 10-stock-module (5 docs) |
-| `apps/backend/src/app.module.ts` | 05-clients-module, 06-cloud-module |
-| `apps/mobile/App.tsx` | 01-project-scaffolding, 04-mobile-auth, 07-offline-sync |
-| `apps/mobile/src/navigation/AppNavigator.tsx` | 04-mobile-auth, 05-clients-module, 06-cloud-module |
-| `apps/mobile/src/hooks/useClients.ts` | 05-clients-module, 07-offline-sync |
-| `apps/mobile/src/hooks/useCloud.ts` | 06-cloud-module, 07-offline-sync |
+| `apps/backend/src/app.module.ts` | 01-project-scaffolding, 05-clients-module, 06-cloud-module (3 docs) |
+| `apps/mobile/App.tsx` | 01-project-scaffolding, 04-mobile-auth, 07-offline-sync (3 docs) |
+| `apps/mobile/src/navigation/AppNavigator.tsx` | 04-mobile-auth, 05-clients-module, 06-cloud-module (3 docs) |
+| `apps/mobile/src/hooks/useClients.ts` | 05-clients-module, 07-offline-sync (2 docs) |
+| `apps/mobile/src/hooks/useCloud.ts` | 06-cloud-module, 07-offline-sync (2 docs) |
 
 ## Warnings
 
