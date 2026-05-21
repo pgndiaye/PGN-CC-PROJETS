@@ -2,12 +2,12 @@
 id: ezviz-senegal-wave-3
 title: "Wave 3: Orders, Payments & Stock"
 initiative: ezviz-senegal
-initiative_version: 5
+initiative_version: 6
 status: integration-pending
 depends_on: ezviz-senegal-wave-2
 demo_state: "Commercial can create orders paid via Mobile Money; stock decrements automatically; web dashboard shows live orders"
 created: 2026-05-20
-hash: 2423c9682987a8e647da014ce84b57c5
+hash: 30f929e8d1359f1a53c2d85e4359982e
 ---
 
 # Wave 3: Orders, Payments & Stock
