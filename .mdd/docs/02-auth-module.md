@@ -6,6 +6,7 @@ depends_on: [01-project-scaffolding]
 source_files:
   - apps/backend/src/modules/auth/auth.module.ts
   - apps/backend/src/modules/auth/auth.service.ts
+  - apps/backend/src/modules/auth/auth.types.ts
   - apps/backend/src/modules/auth/auth.controller.ts
   - apps/backend/src/modules/auth/strategies/jwt.strategy.ts
   - apps/backend/src/modules/auth/strategies/local.strategy.ts
@@ -27,10 +28,10 @@ test_files:
   - apps/backend/src/modules/auth/auth.service.spec.ts
   - apps/backend/src/modules/auth/auth.controller.spec.ts
 data_flow: greenfield
-last_synced: 2026-05-19
+last_synced: 2026-05-21
 status: complete
 phase: all
-mdd_version: 11
+mdd_version: 1.6.13
 tags: [auth, jwt, nestjs, bcrypt, roles, guards, prisma]
 path: Core/Auth
 integration_contracts:
@@ -73,6 +74,9 @@ Shared infrastructure:
 - `PrismaModule` — global, provides `PrismaService` (singleton DB client)
 - `JwtAuthGuard` — applied via `@UseGuards()` on all protected routes
 - `RolesGuard` + `@Roles()` decorator — applied on top of JwtAuthGuard for role checks
+- `auth.types.ts` — defines `UserPayload` (`sub`, `email`, `role`) and `AuthTokens` (`accessToken`, `refreshToken`) interfaces; self-contained within the auth module (not from the shared types package)
+
+`JwtStrategy.validate()` performs a live DB lookup on every authenticated request (`prisma.user.findUnique`). This means deleted or disabled users are rejected immediately — the JWT alone is not sufficient.
 
 ## Data Model
 
@@ -122,6 +126,7 @@ model User {
 - Refresh token rotation: each use of /auth/refresh issues a new access token (refresh token itself is NOT rotated on each use to avoid mobile offline issues)
 - Login endpoint always returns 401 on failure — never reveals which field is wrong
 - Logout clears refreshToken field to null — invalidates all sessions for that user
+- `getMe()` uses `findUniqueOrThrow` — returns 500 if user record is gone (should not happen in normal flow; JWT validation already guards this)
 
 ## Data Flow
 
@@ -137,9 +142,10 @@ Greenfield — no existing code analyzed.
 
 **Threat model:**
 - Brute-force login → rate limiting at 5/15min per IP via ThrottlerGuard
-- Token forgery → JWT signed with HS256 + secret from env (min 32 chars)
-- Stolen refresh token → bcrypt comparison required; raw token not stored
-- Privilege escalation → role encoded in JWT payload, re-verified from DB on /auth/me
+- Token forgery → JWT signed with HS256 + `JWT_SECRET` / `JWT_REFRESH_SECRET` from env (`config.getOrThrow` — app refuses to start if either is unset)
+- Stolen refresh token → bcrypt comparison required; raw token never stored
+- Privilege escalation → role encoded in JWT payload, re-verified from DB on every request via `JwtStrategy.validate()`
+- Deleted user retains access → mitigated: `JwtStrategy.validate()` hits DB on every request; deleted users receive 401 immediately
 
 **What this module must NOT expose:**
 - The bcrypt hash of any password in any response
