@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(pnpm typecheck *)"
+      "Bash(pnpm typecheck *)",
+      "PowerShell(cd \"c:\\\\PGN-CC-PROJETS\\\\apps\\\\mobile\" && npx tsc --noEmit 2>&1 | Where-Object { $_ -notmatch \"expo-constants\" })",
+      "Skill(mdd)"
     ]
   }
 }
