@@ -15,7 +15,7 @@ Cloud
 Commerce
 ├── Orders                 08-orders-module         in_progress
 ├── Payments               09-mobile-money-payment  in_progress
-└── Stock                  10-stock-module             in_progress
+└── Stock                  10-stock-module          in_progress
 Core
 ├── Auth                   02-auth-module           complete
 └── Users                  03-users-module          complete
