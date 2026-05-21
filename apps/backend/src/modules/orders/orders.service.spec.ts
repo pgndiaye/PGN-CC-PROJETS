@@ -91,6 +91,33 @@ describe('OrdersService', () => {
       );
     });
 
+    it('should call decrementByOrderLines fire-and-forget after order creation', async () => {
+      mockPrisma.client.findUnique.mockResolvedValue(mockClient);
+      mockPrisma.$transaction.mockImplementation(async (fn: (tx: typeof mockPrisma) => Promise<unknown>) => fn(mockPrisma));
+      mockPrisma.order.create.mockResolvedValue(mockOrder);
+
+      await service.create(
+        { clientId: 'client-1', lines: [{ productName: 'Camera X', qty: 1, unitPrice: 45000 }] },
+        mockUser.id,
+      );
+
+      expect(mockStock.decrementByOrderLines).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not throw if stock decrement fails', async () => {
+      mockPrisma.client.findUnique.mockResolvedValue(mockClient);
+      mockPrisma.$transaction.mockImplementation(async (fn: (tx: typeof mockPrisma) => Promise<unknown>) => fn(mockPrisma));
+      mockPrisma.order.create.mockResolvedValue(mockOrder);
+      mockStock.decrementByOrderLines.mockRejectedValue(new Error('stock unavailable'));
+
+      await expect(
+        service.create(
+          { clientId: 'client-1', lines: [{ productName: 'Camera X', qty: 1, unitPrice: 45000 }] },
+          mockUser.id,
+        ),
+      ).resolves.toBeDefined();
+    });
+
     it('should throw BadRequestException when lines array is empty', async () => {
       mockPrisma.client.findUnique.mockResolvedValue(mockClient);
 
@@ -119,6 +146,14 @@ describe('OrdersService', () => {
 
       expect(result).toHaveLength(1);
       expect(result[0].id).toBe('order-1');
+    });
+
+    it('should order results by createdAt descending', async () => {
+      mockPrisma.order.findMany.mockResolvedValue([mockOrder]);
+      await service.findAll({});
+      expect(mockPrisma.order.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ orderBy: { createdAt: 'desc' } }),
+      );
     });
 
     it('should filter by clientId when provided', async () => {
@@ -154,6 +189,14 @@ describe('OrdersService', () => {
 
       expect(result.id).toBe('order-1');
       expect(result.lines).toHaveLength(1);
+    });
+
+    it('should include client object in the response', async () => {
+      mockPrisma.order.findUnique.mockResolvedValue(mockOrder);
+      await service.findOne('order-1');
+      expect(mockPrisma.order.findUnique).toHaveBeenCalledWith(
+        expect.objectContaining({ include: expect.objectContaining({ client: true }) }),
+      );
     });
 
     it('should throw NotFoundException for unknown order id', async () => {
