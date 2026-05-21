@@ -30,7 +30,7 @@ models:
 test_files:
   - apps/backend/src/modules/clients/clients.service.spec.ts
 data_flow: greenfield
-last_synced: 2026-05-20
+last_synced: 2026-05-21
 status: complete
 phase: all
 mdd_version: 11
@@ -88,6 +88,7 @@ model Client {
   type      ClientType @default(PARTICULIER)
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+  orders    Order[]    // added in wave-3 (08-orders-module)
 
   @@map("clients")
 }
